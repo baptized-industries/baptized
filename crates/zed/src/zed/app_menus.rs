@@ -43,6 +43,7 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
         MenuItem::action("Outline Panel", outline_panel::ToggleFocus),
         MenuItem::action("Collab Panel", collab_panel::ToggleFocus),
         MenuItem::action("Terminal Panel", terminal_panel::ToggleFocus),
+        MenuItem::action("Baptized Folder", baptized_ui::OpenFolder),
         MenuItem::action("Debugger Panel", ToggleDebugPanel),
         MenuItem::separator(),
         MenuItem::action("Diagnostics", diagnostics::Deploy),
