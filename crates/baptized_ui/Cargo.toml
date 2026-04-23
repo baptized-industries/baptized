@@ -12,6 +12,8 @@ workspace = true
 path = "src/baptized_ui.rs"
 
 [dependencies]
+editor.workspace = true
 gpui.workspace = true
 paths.workspace = true
+ui.workspace = true
 workspace.workspace = true
