@@ -1,7 +1,6 @@
 use editor::Editor;
 use gpui::{
-    App, Context, Entity, EventEmitter, Focusable, ParentElement, Render, Styled, WeakEntity,
-    Window, actions,
+    App, Context, Entity, EventEmitter, Focusable, ParentElement, Render, Styled, Window, actions,
 };
 use paths::config_dir;
 use std::{borrow::Borrow, fs};
@@ -12,32 +11,16 @@ use workspace::{
     notifications::NotifyResultExt,
 };
 
-actions!(baptized, [OpenFolder, ToggleFocus]);
+actions!(baptized, [OpenFolder]);
+actions!(baptized_page, [ToggleFocus]);
 
 pub fn init(cx: &mut App) {
-    cx.observe_new(move |workspace: &mut Workspace, _window, _| {
-        workspace.register_action(move |workspace, _: &ToggleFocus, window, cx| {
-            let existing = workspace
-                .active_pane()
-                .read(cx)
-                .items()
-                .find_map(|item| item.downcast::<BaptizedPage>());
-
-            if let Some(existing) = existing {
-                workspace.activate_item(&existing, true, true, window, cx);
-            } else {
-                let baptized_page = BaptizedPage::new(workspace, window, cx);
-                workspace.add_item_to_active_pane(Box::new(baptized_page), None, true, window, cx)
-            }
-        });
-    })
-    .detach();
-
     cx.observe_new(register).detach();
 }
 
 fn register(workspace: &mut Workspace, _window: Option<&mut Window>, _: &mut Context<Workspace>) {
     workspace.register_action(open_folder);
+    workspace.register_action(toggle_focus);
 }
 
 fn open_folder(
@@ -50,17 +33,32 @@ fn open_folder(
     cx.open_with_system(config_dir().join("baptized").borrow());
 }
 
+fn toggle_focus(
+    workspace: &mut Workspace,
+    _: &ToggleFocus,
+    window: &mut Window,
+    cx: &mut Context<Workspace>,
+) {
+    let existing = workspace
+        .active_pane()
+        .read(cx)
+        .items()
+        .find_map(|item| item.downcast::<BaptizedPage>());
+
+    if let Some(existing) = existing {
+        workspace.activate_item(&existing, true, true, window, cx);
+    } else {
+        let baptized_page = BaptizedPage::new(window, cx);
+        workspace.add_item_to_active_pane(Box::new(baptized_page), None, true, window, cx)
+    }
+}
+
 pub struct BaptizedPage {
-    workspace: WeakEntity<Workspace>,
     query_editor: Entity<Editor>,
 }
 
 impl BaptizedPage {
-    pub fn new(
-        workspace: &Workspace,
-        window: &mut Window,
-        cx: &mut Context<Workspace>,
-    ) -> Entity<Self> {
+    pub fn new(window: &mut Window, cx: &mut Context<Workspace>) -> Entity<Self> {
         cx.new(|cx| {
             let query_editor = cx.new(|cx| {
                 let mut input = Editor::single_line(window, cx);
@@ -68,10 +66,7 @@ impl BaptizedPage {
                 input
             });
 
-            let this = Self {
-                workspace: workspace.weak_handle(),
-                query_editor,
-            };
+            let this = Self { query_editor };
             this
         })
     }
