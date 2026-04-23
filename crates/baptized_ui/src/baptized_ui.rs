@@ -12,6 +12,7 @@ use workspace::{
 };
 
 use pyo3::prelude::*;
+use pyo3_ffi::c_str;
 
 actions!(baptized, [OpenFolder]);
 actions!(baptized_page, [ToggleFocus]);
@@ -62,8 +63,28 @@ pub struct BaptizedPage {
 
 fn helper() -> PyResult<String> {
     Python::attach(|py| {
-        let sys = py.import("sys")?;
-        let version: String = sys.getattr("version")?.extract()?;
+        let module = PyModule::from_code(
+            py,
+            c_str!(
+                r#"
+import signal
+
+import pandas as pd
+
+# numpy messes up keyboard interrupts, this restores defaults
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+def wrapper():
+    data = {"col1": ["val1"], "col2": ["val2"]}
+    df = pd.DataFrame.from_dict(data)
+    return str(df.iloc[0].col1)
+"#
+            ),
+            c_str!("module.py"),
+            c_str!("module"),
+        )?;
+
+        let version: String = module.getattr("wrapper")?.call0()?.extract()?;
         Ok(version)
     })
 }

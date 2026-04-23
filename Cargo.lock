@@ -1996,6 +1996,7 @@ dependencies = [
  "gpui",
  "paths",
  "pyo3",
+ "pyo3-ffi",
  "ui",
  "workspace",
 ]

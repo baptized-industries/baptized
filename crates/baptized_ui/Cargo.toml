@@ -15,6 +15,7 @@ path = "src/baptized_ui.rs"
 editor.workspace = true
 gpui.workspace = true
 paths.workspace = true
+pyo3-ffi = "0.28.0"
 ui.workspace = true
 workspace.workspace = true
 
