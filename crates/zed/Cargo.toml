@@ -169,6 +169,7 @@ zeta2.workspace = true
 zlog.workspace = true
 zlog_settings.workspace = true
 chrono.workspace = true
+pyo3 = { version = "0.28.0", features = ["auto-initialize"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows.workspace = true

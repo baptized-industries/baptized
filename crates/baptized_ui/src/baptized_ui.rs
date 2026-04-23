@@ -11,6 +11,8 @@ use workspace::{
     notifications::NotifyResultExt,
 };
 
+use pyo3::prelude::*;
+
 actions!(baptized, [OpenFolder]);
 actions!(baptized_page, [ToggleFocus]);
 
@@ -55,6 +57,15 @@ fn toggle_focus(
 
 pub struct BaptizedPage {
     query_editor: Entity<Editor>,
+    version: String,
+}
+
+fn helper() -> PyResult<String> {
+    Python::attach(|py| {
+        let sys = py.import("sys")?;
+        let version: String = sys.getattr("version")?.extract()?;
+        Ok(version)
+    })
 }
 
 impl BaptizedPage {
@@ -66,7 +77,12 @@ impl BaptizedPage {
                 input
             });
 
-            let this = Self { query_editor };
+            let version: String = helper().unwrap();
+
+            let this = Self {
+                query_editor,
+                version,
+            };
             this
         })
     }
@@ -88,7 +104,7 @@ impl Render for BaptizedPage {
                             .w_full()
                             .gap_2()
                             .justify_between()
-                            .child(Headline::new("Baptized").size(HeadlineSize::XLarge)),
+                            .child(Headline::new(&self.version).size(HeadlineSize::XLarge)),
                     ),
             )
     }
