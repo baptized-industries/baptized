@@ -88,7 +88,7 @@ jobs:
           if-no-files-found: error
     timeout-minutes: 150
   bundle_windows_x86_64:
-    runs-on: windows-2025-vs2026
+    runs-on: windows-2022
     env:
       CARGO_INCREMENTAL: 0
       ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}

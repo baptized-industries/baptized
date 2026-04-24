@@ -39,8 +39,11 @@ function Get-VSArch {
     }
 }
 
+New-Item -Path "C:\.c" -ItemType Directory
+$env:CARGO_HOME = "C:\.c\"
+
 Push-Location
-& "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1" -Arch (Get-VSArch -Arch $Architecture) -HostArch (Get-VSArch -Arch $OSArchitecture)
+& "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\Launch-VsDevShell.ps1" -Arch (Get-VSArch -Arch $Architecture) -HostArch (Get-VSArch -Arch $OSArchitecture)
 Pop-Location
 
 $target = "$Architecture-pc-windows-msvc"
@@ -67,10 +70,7 @@ function CheckEnvironmentVariables {
     }
 
     $requiredVars = @(
-        'ZED_WORKSPACE', 'RELEASE_VERSION', 'ZED_RELEASE_CHANNEL',
-        'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET',
-        'ACCOUNT_NAME', 'CERT_PROFILE_NAME', 'ENDPOINT',
-        'FILE_DIGEST', 'TIMESTAMP_DIGEST', 'TIMESTAMP_SERVER'
+        'ZED_WORKSPACE'
     )
 
     foreach ($var in $requiredVars) {
